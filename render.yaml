@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: grocery-bot
+    env: python
+    buildCommand: pip install --upgrade pip && pip install pyTelegramBotAPI==4.37.1 Flask==3.1.0 gunicorn==23.0.0 requests==2.34.2
+    startCommand: python3 -m gunicorn --workers 1 --bind 0.0.0.0:$PORT telegram_grocery_bot:app
