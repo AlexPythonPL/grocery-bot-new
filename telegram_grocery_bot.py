@@ -25,21 +25,25 @@ else:
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
+    print(f"👉 СРАБОТАЛ КОМАНДНЫЙ ОБРАБОТЧИК /start для чата {message.chat.id}")
     welcome_text = (
         "Привіт! Я твій Розумний Помічник у магазині. 🛒\n\n"
         "Я допоможу дізнатися реальну ціну за 1 кг/л та обрати вигідніший товар!\n\n"
         "Напиши /calc, щоб розпочати розрахунок ціни."
     )
     bot.reply_to(message, welcome_text)
+    print("✅ Ответ на /start успешно отправлен в Telegram!")
 
 
 @bot.message_handler(commands=['calc'])
 def start_calc(message):
+    print(f"👉 СРАБОТАЛ КОМАНДНЫЙ ОБРАБОТЧИК /calc для чата {message.chat.id}")
     bot.reply_to(message, "Введіть дані у такому форматі:\n\n`Назва1 вага1 ціна1 / Назва2 вага2 ціна2`\n\nПриклад:\n`Сир 200 85 / Сир 300 120`", parse_mode="Markdown")
 
 
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
+    print(f"👉 ПОЛУЧЕН ТЕКСТ ОТ ПОЛЬЗОВАТЕЛЯ: {message.text}")
     # Упрощенный парсер в одну строчку для надежной работы на вебхуках
     try:
         text = message.text.strip()
@@ -80,8 +84,10 @@ def handle_text(message):
             result_text += "⚖️ Ціни за 1 кг/л однакові!"
 
         bot.reply_to(message, result_text, parse_mode="Markdown")
+        print("✅ Результат расчета успешно отправлен в Telegram!")
 
-    except Exception:
+    except Exception as e:
+        print(f"❌ ОШИБКА при обработке текста: {e}")
         bot.reply_to(message, "⚠️ Не вдалось розпізнати формат. Використовуйте приклад:\n`Молоко 900 38 / Молоко 1500 60`", parse_mode="Markdown")
 
 
@@ -95,6 +101,7 @@ def webhook():
         update = telebot.types.Update.de_json(json_string)
         bot.process_new_updates([update])
         return '', 200
+    print("⚠️ Ошибка content-type:", request.headers.get('content-type'))
     return 'Forbidden', 403
 
 @app.route('/')
