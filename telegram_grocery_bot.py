@@ -12,9 +12,6 @@ if not BOT_TOKEN:
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
-bot = telebot.TeleBot(BOT_TOKEN)
-app = Flask(__name__)
-
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -37,7 +34,6 @@ def start_calc(message):
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
     print(f"👉 ПОЛУЧЕН ТЕКСТ ОТ ПОЛЬЗОВАТЕЛЯ: {message.text}")
-    # Упрощенный парсер в одну строчку для надежной работы на вебхуках
     try:
         text = message.text.strip()
         if '/' not in text:
@@ -105,6 +101,12 @@ def webhook():
         print(f"❌ ОШИБКА ВНУТРИ ВЕБХУКА: {e}")
         
     return '', 200
+
+
+@app.route('/')
+def index():
+    return "Grocery Bot is running!", 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
