@@ -89,18 +89,22 @@ def webhook():
     if request.method == 'GET':
         return "Webhook endpoint is active!", 200
         
-    if request.headers.get('content-type', '').startswith('application/json'):
+    print("🔔 ПОЛУЧЕН POST-ЗАПРОС ОТ TELEGRAM!")
+    try:
         json_string = request.get_data().decode('utf-8')
+        print(f"📦 Текст пакета от Telegram: {json_string[:150]}...") # выведем начало пакета
+        
         update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return '', 200
-    print("⚠️ Ошибка content-type:", request.headers.get('content-type'))
-    return 'Forbidden', 403
-
-@app.route('/')
-def index():
-    return "Grocery Bot is running!", 200
-
+        if update:
+            print("✅ Объект Update успешно создан, передаем боту...")
+            bot.process_new_updates([update])
+            print("✅ Обработка updates завершена успешно!")
+        else:
+יש                 print("⚠️ Предупреждение: update оказался пустым (None)")
+    except Exception as e:
+        print(f"❌ ОШИБКА ВНУТРИ ВЕБХУКА: {e}")
+        
+    return '', 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
