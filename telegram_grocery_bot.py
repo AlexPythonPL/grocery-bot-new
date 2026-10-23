@@ -2,10 +2,8 @@ import os
 import telebot
 from flask import Flask, request
 
-# Читаем токен и выводим его длину для отладки в логах Render
+# Читаем токен
 BOT_TOKEN = os.environ.get('BOT_TOKEN', '').strip()
-print(f"DEBUG_CHECK -> BOT_TOKEN length: {len(BOT_TOKEN) if BOT_TOKEN else 'NOT FOUND'}")
-
 if not BOT_TOKEN:
     raise ValueError("❌ ОШИБКА: Переменная окружения BOT_TOKEN не найдена на Render!")
 
@@ -42,13 +40,11 @@ def handle_text(message):
 
         part1, part2 = text.split('/', 1)
         
-        # Разбираем первый товар
         p1_words = part1.strip().split()
         price1 = float(p1_words[-1].replace(',', '.'))
         netto1 = float(p1_words[-2].replace(',', '.'))
         name1 = " ".join(p1_words[:-2])
 
-        # Разбираем второй товар
         p2_words = part2.strip().split()
         price2 = float(p2_words[-1].replace(',', '.'))
         netto2 = float(p2_words[-2].replace(',', '.'))
@@ -80,27 +76,16 @@ def handle_text(message):
         bot.reply_to(message, "⚠️ Не вдалось розпізнати формат. Використовуйте приклад:\n`Молоко 900 38 / Молоко 1500 60`", parse_mode="Markdown")
 
 
-@app.route(f"/{BOT_TOKEN}", methods=['POST', 'GET'])
+# Официальный и самый надежный обработчик вебхука для Flask от pyTelegramBotAPI
+@app.route(f"/{BOT_TOKEN}", methods=['POST'])
 def webhook():
-    if request.method == 'GET':
-        return "Webhook endpoint is active!", 200
-        
-    print("🔔 ПОЛУЧЕН POST-ЗАПРОС ОТ TELEGRAM!")
-    try:
+    if request.headers.get('content-type') == 'application/json':
         json_string = request.get_data().decode('utf-8')
-        print(f"📦 Текст пакета от Telegram: {json_string[:150]}...")
-        
         update = telebot.types.Update.de_json(json_string)
-        if update:
-            print("✅ Объект Update успешно создан, передаем боту...")
-            bot.process_new_updates([update])
-            print("✅ Обработка updates завершена успешно!")
-        else:
-            print("⚠️ Предупреждение: update оказался пустым (None)")
-    except Exception as e:
-        print(f"❌ ОШИБКА ВНУТРИ ВЕБХУКА: {e}")
-        
-    return '', 200
+        bot.process_new_updates([update])
+        return "", 200
+    else:
+        return "Forbidden", 403
 
 
 @app.route('/')
