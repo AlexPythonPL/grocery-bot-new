@@ -12,12 +12,8 @@ if not BOT_TOKEN:
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
-# Принудительная установка вебхука на ваш адрес Render
-RENDER_URL = "https://grocery-bot-new.onrender.com"
-webhook_url = f"{RENDER_URL}/{BOT_TOKEN}"
-bot.remove_webhook()
-bot.set_webhook(url=webhook_url)
-print(f"✅ ПРИНУДИТЕЛЬНЫЙ ВЕБХУК УСТАНОВЛЕН НА: {webhook_url}")
+bot = telebot.TeleBot(BOT_TOKEN)
+app = Flask(__name__)
 
 
 @bot.message_handler(commands=['start', 'help'])
