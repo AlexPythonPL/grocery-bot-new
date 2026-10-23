@@ -85,16 +85,17 @@ def handle_text(message):
         bot.reply_to(message, "⚠️ Не вдалось розпізнати формат. Використовуйте приклад:\n`Молоко 900 38 / Молоко 1500 60`", parse_mode="Markdown")
 
 
-# Надежный вебхук-маршрут (без жесткой привязки к точным параметрам content-type)
-@app.route(f"/{BOT_TOKEN}", methods=['POST'])
+@app.route(f"/{BOT_TOKEN}", methods=['POST', 'GET'])
 def webhook():
+    if request.method == 'GET':
+        return "Webhook endpoint is active!", 200
+        
     if request.headers.get('content-type', '').startswith('application/json'):
         json_string = request.get_data().decode('utf-8')
         update = telebot.types.Update.de_json(json_string)
         bot.process_new_updates([update])
         return '', 200
     return 'Forbidden', 403
-
 
 @app.route('/')
 def index():
