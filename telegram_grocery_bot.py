@@ -92,7 +92,7 @@ def webhook():
     print("🔔 ПОЛУЧЕН POST-ЗАПРОС ОТ TELEGRAM!")
     try:
         json_string = request.get_data().decode('utf-8')
-        print(f"📦 Текст пакета от Telegram: {json_string[:150]}...") # выведем начало пакета
+        print(f"📦 Текст пакета от Telegram: {json_string[:150]}...")
         
         update = telebot.types.Update.de_json(json_string)
         if update:
@@ -100,7 +100,7 @@ def webhook():
             bot.process_new_updates([update])
             print("✅ Обработка updates завершена успешно!")
         else:
-יש                 print("⚠️ Предупреждение: update оказался пустым (None)")
+            print("⚠️ Предупреждение: update оказался пустым (None)")
     except Exception as e:
         print(f"❌ ОШИБКА ВНУТРИ ВЕБХУКА: {e}")
         
